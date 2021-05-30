@@ -20,8 +20,10 @@ export const fetchUser = (userId) => async dispatch => {
 
 export const fetchPostsAndUsers = () => async (dispatch, getState) => {
     await dispatch(fetchPosts());
-    //use lodash map to find out unique user ids
-    const uniqueUserIds = _.uniq(_.map(getState().posts,"userId"));
-    // console.log(uniqueUserIds)
-    uniqueUserIds.forEach(id => dispatch(fetchUser(id)));
+
+    _.chain(getState().posts)
+        .map("userId")
+        .uniq()
+        .forEach(id => dispatch(fetchUser(id)))
+        .value();
 };
