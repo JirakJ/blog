@@ -9,13 +9,19 @@ export const fetchPosts = () => async dispatch => {
         })
     };
 
-export const fetchUser = (userId) => dispatch => _fetchUser(userId, dispatch);
-
-//private function
-const _fetchUser = _.memoize(async (userId, dispatch) => {
+export const fetchUser = (userId) => async dispatch => {
     const response = await jsonPlaceholderTypicode.get(`/users/${userId}`);
     dispatch({
         type: "FETCH_USER",
         payload: response.data
     })
-});
+};
+
+
+export const fetchPostsAndUsers = () => async (dispatch, getState) => {
+    await dispatch(fetchPosts());
+    //use lodash map to find out unique user ids
+    const uniqueUserIds = _.uniq(_.map(getState().posts,"userId"));
+    // console.log(uniqueUserIds)
+    uniqueUserIds.forEach(id => dispatch(fetchUser(id)));
+};
